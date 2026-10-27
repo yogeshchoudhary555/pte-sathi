@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PTE Sathi - Free PTE Practice, Hindi Meaning ke Saath</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header>
+  <h1>🎓 PTE Sathi</h1>
+  <p>Padho, samjho, practice karo — Hindi meaning ke saath, bilkul free.</p>
+  <button class="btn" id="hindiBtn" onclick="toggleHindi()">Hindi meaning dikhao</button>
+  <p class="muted" style="color:#e0e7ff">Kisi bhi dotted word par tap karo, uska Hindi meaning dikhega.</p>
+</header>
+<div class="wrap">
+
+<!-- HOME -->
+<div id="view-home" class="view">
+  <div class="card">
+    <h2>Namaste! Aaj ka practice shuru karo 👇</h2>
+    <p class="muted">Koi login nahi, koi payment nahi, koi server nahi. Sab kuch isi phone me chalega. Ye practice feedback hai, asli PTE AI scoring nahi.</p>
+    <button class="bigbtn" onclick="show('speaking')">▶ Aaj ka practice: Speaking se shuru karo</button>
+    <button class="bigbtn secondary" onclick="startMock(); show('mock')">⏱ Mini Mock Test do (10 min)</button>
+    <div id="progress" class="progress"></div>
+    <button class="btn" onclick="localStorage.removeItem('pteSathiProgress');location.reload()">Progress reset karo</button>
+  </div>
+  <div class="card"><h2>Sections — bada button dabao, section khul jayega</h2>
+    <button class="btn opt" onclick="show('speaking')">🎤 Speaking (7 types)</button>
+    <button class="btn opt" onclick="show('writing')">✍️ Writing (2 types + templates)</button>
+    <button class="btn opt" onclick="show('reading')">📖 Reading (5 types)</button>
+    <button class="btn opt" onclick="show('listening')">🎧 Listening (7 types)</button>
+    <button class="btn opt" onclick="show('vocab')">📚 Vocab — Hindi meaning ke saath</button>
+    <button class="btn opt" onclick="show('guide')">📋 Study Guide — slot-wise templates</button>
+    <button class="btn opt" onclick="show('mock')">⏱ Mock Test</button>
+  </div>
+  <div class="card"><h2>Target yaad rakho</h2><p>NZ study ke liye safe target <b>PTE 58</b> hai — diploma 42, bachelor 50, PG 58. Sirf overall nahi, har skill balanced honi chahiye. Roz thoda-thoda, roz check, roz sudhaar.</p></div>
+</div>
+
+<!-- SPEAKING -->
+<div id="view-speaking" class="view hidden">
+  <div class="card"><h2>🎤 Speaking</h2><p class="muted">Read Aloud: zor se padho, rukna nahi. Repeat Sentence: 3-4 chunks me yaad karo. Describe Image: template se bolo. Speaking ke scored questions (Answer Short Question) neeche hain, baaki prompts self-practice ke liye hain.</p></div>
+  <div id="list-speaking"></div>
+  <div id="prompts-speaking"></div>
+</div>
+
+<!-- WRITING -->
+<div id="view-writing" class="view hidden">
+  <div class="card"><h2>✍️ Writing</h2><p class="muted">Summarize Written Text me sirf 1 sentence, 5-75 words. Essay me 200-300 words. Template Study Guide me bhi hai.</p></div>
+  <div id="prompts-writing"></div>
+</div>
+
+<!-- READING -->
+<div id="view-reading" class="view hidden">
+  <div class="card"><h2>📖 Reading</h2><p class="muted">Pehle subtype chunno, phir question karo. Har galat jawab ke baad Hindi explanation milega.</p></div>
+  <div id="list-reading"></div>
+</div>
+
+<!-- LISTENING -->
+<div id="view-listening" class="view hidden">
+  <div class="card"><h2>🎧 Listening</h2><p class="muted">Listening me audio ek baar hi hota hai asli exam me. Yahan sentence padhkar, chhupakar likhne ki practice karo — yehi Write From Dictation ki aadat banata hai.</p></div>
+  <div id="list-listening"></div>
+  <div id="prompts-sst"></div>
+</div>
+
+<!-- VOCAB -->
+<div id="view-vocab" class="view hidden">
+  <div class="card"><h2>📚 Vocab — Hindi meaning ke saath</h2>
+    <input type="text" id="vocabSearch" placeholder="Word dhoondho, jaise: adopt, hinder..." oninput="renderVocab()">
+    <p class="muted">Har word: English meaning + Hindi meaning (Devanagari) + example sentence.</p>
+  </div>
+  <div id="vocabList" class="vocab-grid"></div>
+</div>
+
+<!-- GUIDE -->
+<div id="view-guide" class="view hidden">
+  <div class="card"><h2>📋 Study Guide — kaunsa word kahan aayega</h2>
+    <h3>Describe Image</h3>
+    <p>The <span class="slot">[chart type]</span> shows <span class="slot">[topic]</span>. The main point is that <span class="slot">[sabse bada point + figure]</span>. In addition, <span class="slot">[doosra point + figure]</span>. Overall, this suggests that <span class="slot">[conclusion]</span>.</p>
+    <h3>Retell Lecture</h3>
+    <p>The lecture was about <span class="slot">[topic]</span>. First, the speaker explained that <span class="slot">[point 1]</span>. Then, the speaker discussed <span class="slot">[point 2]</span>. In conclusion, the speaker suggested that <span class="slot">[conclusion]</span>.</p>
+    <h3>Summarize Written Text (sirf 1 sentence)</h3>
+    <p><span class="slot">[Main idea]</span>, because <span class="slot">[point 1]</span>, and <span class="slot">[point 2]</span>.</p>
+    <h3>Essay (200-300 words)</h3>
+    <p>Intro: <span class="slot">[topic + apni position + 2 reasons]</span> → Body 1: <span class="slot">[reason 1 + explain + example]</span> → Body 2: <span class="slot">[reason 2 + explain + example]</span> → Conclusion: <span class="slot">[dobara position, short me]</span></p>
+    <h3>Summarize Spoken Text (50-70 words)</h3>
+    <p><span class="slot">[Topic]</span> + <span class="slot">[point 1]</span> + <span class="slot">[point 2 / example]</span> + <span class="slot">[conclusion]</span>, 3-4 sentences me.</p>
+    <h3>Respond to a Situation (40 sec)</h3>
+    <p><span class="slot">[Problem acknowledge karo]</span> → <span class="slot">[clear request]</span> → <span class="slot">[short reason]</span> → Thank you, I would really appreciate your help.</p>
+    <h3>Summarize Group Discussion (2 min)</h3>
+    <p>The group discussed <span class="slot">[topic]</span>. One speaker argued that <span class="slot">[point 1]</span>, while another pointed out that <span class="slot">[point 2]</span>. Overall, the group agreed that <span class="slot">[agreement]</span>.</p>
+    <p class="muted">Yaad rakho: template sirf dhancha hai, content har baar question se bharna hai. Rata-rataya paragraph chipkana nuksaan karta hai.</p>
+  </div>
+</div>
+
+<!-- MOCK -->
+<div id="view-mock" class="view hidden">
+  <div class="card"><h2>⏱ Mini Mock Test</h2><p class="timer" id="mockTimer">⏱ 10:00</p><p class="muted">10 mixed questions, 10 minute timer. Ye practice score hai, asli PTE score nahi.</p><button class="bigbtn" onclick="startMock()">Mock shuru karo</button></div>
+  <div id="mockBox"></div>
+</div>
+
+<footer>PTE Sathi v1 — Original practice content. APEUni/Pearson se inspire concept only, unka question bank, code ya API copy nahi kiya gaya. No login, no payment, no server.</footer>
+</div>
+
+<nav>
+  <button data-view="home" class="active" onclick="show('home')">🏠 Home</button>
+  <button data-view="speaking" onclick="show('speaking')">🎤 Speaking</button>
+  <button data-view="writing" onclick="show('writing')">✍️ Writing</button>
+  <button data-view="reading" onclick="show('reading')">📖 Reading</button>
+  <button data-view="listening" onclick="show('listening')">🎧 Listening</button>
+  <button data-view="vocab" onclick="show('vocab')">📚 Vocab</button>
+  <button data-view="guide" onclick="show('guide')">📋 Guide</button>
+  <button data-view="mock" onclick="show('mock')">⏱ Mock</button>
+</nav>
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
